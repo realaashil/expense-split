@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "159533889035",
+    "project_id": "expense-split-aashil",
+    "storage_bucket": "expense-split-aashil.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:159533889035:android:92613a985923e58889790e",
+        "android_client_info": {
+          "package_name": "com.example.expense_split"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1cPUjFfsSWwaDoN-bhCkkdDRKg1TpUY8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
