@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
+import 'package:expense_split/services/database.dart';
 
 class Lena extends StatefulWidget {
   const Lena({super.key});
@@ -27,34 +28,15 @@ class _LenaState extends State<Lena> {
     super.dispose();
   }
 
-  Future<String> _getVpa() async {
-    final user = _auth.currentUser;
-    if (user == null) return '';
-    final doc = await _firestore.collection('users').doc(user.uid).get();
-    print(user.uid);
-    final data = doc.data() as Map<String, dynamic>;
-    return data['vpa'] ?? '';
-  }
-
   Future<void> _addExpense() async {
     if (_formKey.currentState!.validate()) {
       try {
         // Get current user
-        final user = _auth.currentUser;
-        final vpa = await _getVpa();
-        if (user == null) return;
-
-        // Add expense to Firestore
-        await _firestore.collection('expenses').add({
-          'amount': double.parse(_amountController.text),
-          'payerEmail': _payerEmailController.text.trim(),
-          'creatorId': user.uid,
-          'creatorEmail': user.email,
-          'description': _descriptionController.text,
-          'creatorVpa': vpa,
-          'status': 'pending',
-          'createdAt': FieldValue.serverTimestamp(),
-        });
+        double amount = double.parse(_amountController.text);
+        amount = double.parse(amount.toStringAsFixed(2));
+        String email = _payerEmailController.text.trim();
+        String description = _descriptionController.text.trim();
+        Database.addExpense(amount, email, description);
 
         // Clear controllers
         _amountController.clear();
@@ -199,9 +181,9 @@ class _LenaState extends State<Lena> {
                 elevation: 3,
                 child: ListTile(
                   leading: CircleAvatar(
-                    child: Text('₹${amount.toInt()}'),
                     backgroundColor: Theme.of(context).primaryColor,
                     foregroundColor: Colors.white,
+                    child: Text('₹${amount.toInt()}'),
                   ),
                   title: Text('From: $payerEmail'),
                   subtitle: Column(
@@ -239,8 +221,8 @@ class _LenaState extends State<Lena> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddExpenseDialog,
-        child: const Icon(Icons.add),
         tooltip: 'Add new expense',
+        child: const Icon(Icons.add),
       ),
     );
   }

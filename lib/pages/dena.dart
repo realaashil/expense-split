@@ -21,7 +21,6 @@ class _DenaState extends State<Dena> {
         'status': 'paid',
         'paidAt': FieldValue.serverTimestamp(),
       });
-
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -43,24 +42,7 @@ class _DenaState extends State<Dena> {
   }
 
   Future<void> _initiateUpiPayment(Map<String, dynamic> expense) async {
-    // Get creator's VPA from the expense or from the users collection
     String? vpa = expense['creatorVpa'];
-
-    // If VPA is not stored in expense, try to fetch from users collection
-    if (vpa == null || vpa.isEmpty) {
-      try {
-        final creatorId = expense['creatorId'];
-        if (creatorId != null) {
-          final creatorDoc =
-              await _firestore.collection('users').doc(creatorId).get();
-          if (creatorDoc.exists) {
-            vpa = creatorDoc.data()?['vpa'];
-          }
-        }
-      } catch (e) {
-        print('Error fetching VPA: $e');
-      }
-    }
 
     if (vpa == null || vpa.isEmpty) {
       if (mounted) {
@@ -77,7 +59,7 @@ class _DenaState extends State<Dena> {
     final amount = expense['amount']?.toString() ?? '0';
     final description = expense['description'] ?? 'Expense Payment';
     final payeeName =
-        expense['creatorEmail']?.toString().split('@')[0] ?? 'Recipient';
+        expense['creatorName']?.toString().split('@')[0] ?? 'Recipient';
 
     // Create UPI URL
     final upiUrl = 'upi://pay?pa=$vpa&pn=$payeeName&am=$amount&tn=$description';
