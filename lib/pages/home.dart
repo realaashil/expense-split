@@ -1,13 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:expense_split/pages/dena.dart';
 import 'package:expense_split/pages/lena.dart';
-import 'package:expense_split/pages/settings.dart';
+import 'package:expense_split/pages/settings_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
+  const MyHomePage({super.key});
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -15,7 +14,6 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _pageIndex = 0;
-
   void setPageIndex(int index) {
     setState(() {
       _pageIndex = index;
@@ -31,7 +29,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+        title: Text("Hi There"),
         actions: [IconButton(onPressed: _signOut, icon: Icon(Icons.logout))],
       ),
       bottomNavigationBar: Navigation(
@@ -41,7 +39,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: <Widget>[
         Lena(),
         Dena(),
-        Settings(),
+        SettingsScreen(),
       ][_pageIndex],
     );
   }

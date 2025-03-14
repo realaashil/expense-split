@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -16,14 +17,32 @@ class _AuthScreenState extends State<AuthScreen> {
 
   var _isLoading = false;
 
+  Future<void> addUserDb(
+      String userID, String email, String userName, String vpa) async {
+    try {
+      FirebaseFirestore db = FirebaseFirestore.instance;
+      final user = <String, dynamic>{
+        'uid': userID,
+        'email': email,
+        'username': userName,
+        'vpa': vpa, // Add UPI ID
+        'createdAt': FieldValue.serverTimestamp(), // Add timestamp
+      };
+      await db.collection("users").doc(userID).set(user);
+    } catch (e) {
+      print("Firestore error: $e");
+      rethrow; // Re-throw to handle in calling function
+    }
+  }
+
   void _submitAuthForm(
     String email,
     String password,
     String userName,
+    String vpa,
     bool isLogin,
     BuildContext ctx,
   ) async {
-    // ignore: unused_local_variable
     UserCredential userCredential;
     try {
       setState(() {
@@ -35,6 +54,28 @@ class _AuthScreenState extends State<AuthScreen> {
       } else {
         userCredential = await _auth.createUserWithEmailAndPassword(
             email: email, password: password);
+        // Add proper error handling for the database operation
+        if (userCredential.user != null) {
+          try {
+            await addUserDb(userCredential.user!.uid, email, userName, vpa);
+          } catch (dbError) {
+            // Handle database errors specifically
+            if (mounted) {
+              ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
+                content: Text(
+                    "Failed to create user profile: ${dbError.toString()}"),
+                backgroundColor: Theme.of(ctx).colorScheme.error,
+              ));
+            }
+          }
+        }
+      }
+
+      // Clear loading state on success
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
       }
     } on PlatformException catch (err) {
       var message = "An error occured please check your credentails";

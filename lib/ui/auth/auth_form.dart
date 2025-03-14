@@ -12,6 +12,7 @@ class AuthForm extends StatefulWidget {
     String email,
     String password,
     String userName,
+    String vpa,
     bool isLogin,
     BuildContext ctx,
   ) submitFn;
@@ -26,6 +27,7 @@ class _AuthFormState extends State<AuthForm> {
   var _userEmail = '';
   var _userName = '';
   var _userPassword = '';
+  var _vpa = '';
 
   void _trySubmit() {
     final isValid = _formKey.currentState?.validate() ?? false;
@@ -34,7 +36,7 @@ class _AuthFormState extends State<AuthForm> {
     if (isValid) {
       _formKey.currentState!.save();
       widget.submitFn(_userEmail.trim(), _userPassword.trim(), _userName.trim(),
-          _isLogin, context);
+          _vpa.trim(), _isLogin, context);
     }
   }
 
@@ -137,6 +139,36 @@ class _AuthFormState extends State<AuthForm> {
                         },
                       ),
 
+                    if (!_isLogin) const SizedBox(height: 15),
+                    if (!_isLogin)
+                      TextFormField(
+                        key: const ValueKey('vpa'),
+                        decoration: InputDecoration(
+                          labelText: 'VPA',
+                          hintText: 'Enter your VPA',
+                          prefixIcon: const Icon(Icons.account_balance_wallet),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: Colors.grey.shade300),
+                          ),
+                        ),
+                        keyboardType: TextInputType.emailAddress,
+                        autocorrect: false,
+                        textCapitalization: TextCapitalization.none,
+                        enableSuggestions: false,
+                        validator: (value) {
+                          if (value!.isEmpty || !value.contains('@')) {
+                            return 'Please enter a valid VPA';
+                          }
+                          return null;
+                        },
+                        onSaved: (value) {
+                          _vpa = value!;
+                        },
+                      ),
                     if (!_isLogin) const SizedBox(height: 15),
 
                     // Password field

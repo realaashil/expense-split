@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
                 return const SplashScreen();
               }
               if (userSnapShot.hasData) {
-                return const MyHomePage(title: "Flutter Expense Split");
+                return const MyHomePage();
               }
               return AuthScreen();
             }));
