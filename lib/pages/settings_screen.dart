@@ -16,6 +16,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final _vpaController = TextEditingController();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
+  String _username = '';
 
   bool _isLoading = false;
   String _errorMessage = '';
@@ -45,7 +46,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       String name = await Database.getUsername();
       setState(() {
         _vpaController.text = vpa;
-        _nameController.text = name;
+        _username = name;
       });
     } catch (e) {
       setState(() {
@@ -171,7 +172,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   color: theme.primaryColor),
                               const SizedBox(width: 8),
                               Text(
-                                _nameController.text,
+                                _username,
                                 style: theme.textTheme.titleLarge,
                               ),
                             ],
