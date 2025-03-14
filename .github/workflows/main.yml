@@ -13,6 +13,8 @@ jobs:
   build:      
     name: Build & Release 
     runs-on: ubuntu-latest 
+    permissions:
+      contents: write
 
     steps:
         #1 Checkout Repository
@@ -97,5 +99,4 @@ jobs:
         with:
           artifacts: "build/app/outputs/flutter-apk/app-release.apk,build/app/outputs/bundle/release/app-release.aab"
           tag: v${{ env.VERSION }}
-          token: ${{ secrets.TOKEN }}
         
