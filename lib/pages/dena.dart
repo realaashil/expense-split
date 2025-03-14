@@ -1,3 +1,4 @@
+import 'package:expense_split/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -17,10 +18,7 @@ class _DenaState extends State<Dena> {
 
   Future<void> _markAsPaid(String expenseId) async {
     try {
-      await _firestore.collection('expenses').doc(expenseId).update({
-        'status': 'paid',
-        'paidAt': FieldValue.serverTimestamp(),
-      });
+      await Database.updateExpenseStatus(expenseId, 'paid');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -160,10 +158,10 @@ class _DenaState extends State<Dena> {
               final expenseDoc = sortedExpenses[index];
               final expense = expenseDoc.data() as Map<String, dynamic>;
               final amount = expense['amount'] ?? 0.0;
-              final creatorEmail = expense['creatorEmail'] ?? 'Unknown';
               final description = expense['description'] ?? 'No description';
               final status = expense['status'] ?? 'pending';
               final isPaid = status == 'paid';
+              final creatorName = expense['creatorName'] ?? 'Unknown';
 
               // Format timestamp if available
               String dateStr = 'Just now';
@@ -215,7 +213,7 @@ class _DenaState extends State<Dena> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'To: $creatorEmail',
+                                  'To: $creatorName',
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,

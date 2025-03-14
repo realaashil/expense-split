@@ -30,7 +30,6 @@ class _AuthScreenState extends State<AuthScreen> {
       };
       await db.collection("users").doc(userID).set(user);
     } catch (e) {
-      print("Firestore error: $e");
       rethrow; // Re-throw to handle in calling function
     }
   }
