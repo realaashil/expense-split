@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:159533889035:android:92613a985923e58889790e",
+        "mobilesdk_app_id": "1:159533889035:android:0a71f2a4dcbba38389790e",
         "android_client_info": {
-          "package_name": "com.example.expense_split"
+          "package_name": "com.aashil.expense_split"
         }
       },
       "oauth_client": [],
