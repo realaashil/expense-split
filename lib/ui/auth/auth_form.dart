@@ -42,6 +42,7 @@ class _AuthFormState extends State<AuthForm> {
 
   @override
   Widget build(BuildContext context) {
+    ThemeData theme = Theme.of(context);
     return SafeArea(
       child: Center(
         child: SingleChildScrollView(
@@ -55,7 +56,7 @@ class _AuthFormState extends State<AuthForm> {
               Icon(
                 Icons.account_balance_wallet_rounded,
                 size: 100,
-                color: Theme.of(context).primaryColor,
+                color: theme.primaryColor,
               ),
 
               const SizedBox(height: 30),
@@ -227,19 +228,8 @@ class _AuthFormState extends State<AuthForm> {
                   height: 50,
                   child: ElevatedButton(
                     onPressed: _trySubmit,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).primaryColor,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
                     child: Text(
                       _isLogin ? 'LOGIN' : 'SIGN UP',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
                     ),
                   ),
                 ),

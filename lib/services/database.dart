@@ -36,6 +36,14 @@ class Database {
     return data['vpa'] ?? '';
   }
 
+  static Future<void> updateVpa(String vpa) async {
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw Exception("User not found");
+    }
+    await _db.collection('users').doc(user.uid).update({'vpa': vpa});
+  }
+
   static Future<String> getUsername() async {
     final doc = await _getData();
     final data = doc.data() as Map<String, dynamic>;
@@ -66,5 +74,30 @@ class Database {
   static Future<void> updateExpenseStatus(
       String expenseId, String status) async {
     await _db.collection('expenses').doc(expenseId).update({'status': status});
+  }
+
+  static Future<void> addFavorite(String name, String email) async {
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw Exception("User not found");
+    }
+    await _db.collection('users').doc(user.uid).collection('favorites').add({
+      'name': name,
+      'email': email,
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  static Future<void> deleteFavorite(String favoriteId) async {
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw Exception("User not found");
+    }
+    await _db
+        .collection('users')
+        .doc(user.uid)
+        .collection('favorites')
+        .doc(favoriteId)
+        .delete();
   }
 }

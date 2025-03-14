@@ -56,9 +56,17 @@ class Navigation extends StatelessWidget {
       selectedIndex: currentIndex,
       onDestinationSelected: setPageIndex,
       destinations: <Widget>[
-        NavigationDestination(icon: Icon(Icons.money), label: "Lena"),
+        NavigationDestination(
+          icon: Icon(Icons.currency_bitcoin),
+          label: "Lena",
+          selectedIcon: Icon(Icons.currency_bitcoin_outlined),
+        ),
         NavigationDestination(icon: Icon(Icons.wallet), label: "Dena"),
-        NavigationDestination(icon: Icon(Icons.settings), label: "Setting"),
+        NavigationDestination(
+          icon: Icon(Icons.settings_outlined),
+          label: "Setting",
+          selectedIcon: Icon(Icons.settings),
+        ),
       ],
     );
   }
