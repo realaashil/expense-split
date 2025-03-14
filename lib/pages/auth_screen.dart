@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:expense_split/ui/auth/auth_form.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -54,10 +55,16 @@ class _AuthScreenState extends State<AuthScreen> {
         });
       }
     } catch (err) {
-      // ignore: avoid_print
-      print(err);
+      Fluttertoast.showToast(
+          msg: "Your credentials are incorrect",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          webBgColor: "#e74c3c",
+          timeInSecForIosWeb: 10,
+          fontSize: 16.0);
       if (mounted) {
-        // Add mounted check here too
         setState(() {
           _isLoading = false;
         });
