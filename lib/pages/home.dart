@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:expense_split/pages/dena.dart';
 import 'package:expense_split/pages/lena.dart';
 import 'package:expense_split/pages/settings_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -24,7 +23,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text("SplitWise"),
+        title: Text("KarchaPaani"),
       ),
       bottomNavigationBar: Navigation(
         setPageIndex: setPageIndex,
@@ -52,15 +51,22 @@ class Navigation extends StatelessWidget {
       onDestinationSelected: setPageIndex,
       destinations: <Widget>[
         NavigationDestination(
-          icon: Icon(Icons.currency_bitcoin),
+          icon: Icon(Icons.currency_bitcoin, color: Colors.green),
           label: "Lena",
-          selectedIcon: Icon(Icons.currency_bitcoin_outlined),
         ),
-        NavigationDestination(icon: Icon(Icons.wallet), label: "Dena"),
         NavigationDestination(
-          icon: Icon(Icons.settings_outlined),
+            icon: Icon(
+              Icons.wallet,
+              color: Colors.red,
+            ),
+            label: "Dena"),
+        NavigationDestination(
+          icon: Icon(Icons.settings_outlined, color: Colors.amber),
           label: "Setting",
-          selectedIcon: Icon(Icons.settings),
+          selectedIcon: Icon(
+            Icons.settings,
+            color: Colors.amber,
+          ),
         ),
       ],
     );
