@@ -29,8 +29,8 @@ class MyApp extends StatelessWidget {
           // textTheme: ShadTextTheme(family: 'UbuntuMono'),
         ),
         theme: ShadThemeData(
-          brightness: Brightness.dark,
-          colorScheme: const ShadZincColorScheme.dark(),
+          brightness: Brightness.light,
+          colorScheme: const ShadZincColorScheme.light(),
           // Example of custom font family
           // textTheme: ShadTextTheme(family: 'UbuntuMono'),
         ),

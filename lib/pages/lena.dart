@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import 'package:expense_split/services/database.dart';
+import 'package:expense_split/ui/card/expense_card.dart';
 
 class Lena extends StatefulWidget {
   const Lena({super.key});
@@ -167,6 +168,7 @@ class _LenaState extends State<Lena> {
               final payerEmail = expense['payerEmail'] ?? 'Unknown';
               final description = expense['description'] ?? 'No description';
               final status = expense['status'] ?? 'pending';
+              bool paid = status == 'paid';
 
               // Format timestamp if available
               String dateStr = 'Just now';
@@ -176,44 +178,15 @@ class _LenaState extends State<Lena> {
                 dateStr = DateFormat('MMM d, y').format(date);
               }
 
-              return Card(
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                elevation: 3,
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: Theme.of(context).primaryColor,
-                    foregroundColor: Colors.white,
-                    child: Text('₹${amount.toInt()}'),
-                  ),
-                  title: Text('From: $payerEmail'),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(description),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Text(dateStr, style: const TextStyle(fontSize: 12)),
-                          const Spacer(),
-                          Chip(
-                            label: Text(status),
-                            backgroundColor: status == 'pending'
-                                ? Colors.orange.shade100
-                                : Colors.green.shade100,
-                            labelStyle: TextStyle(
-                              color: status == 'pending'
-                                  ? Colors.orange.shade800
-                                  : Colors.green.shade800,
-                              fontSize: 12,
-                            ),
-                            padding: EdgeInsets.zero,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  isThreeLine: true,
-                ),
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ExpenseCard(
+                    description: description,
+                    dateStr: dateStr,
+                    amount: amount,
+                    payerEmail: payerEmail,
+                    status: status,
+                    paid: paid),
               );
             },
           );

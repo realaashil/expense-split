@@ -28,8 +28,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text("Hi There"),
-        actions: [IconButton(onPressed: _signOut, icon: Icon(Icons.logout))],
+        title: Text("SplitWise"),
       ),
       bottomNavigationBar: Navigation(
         setPageIndex: setPageIndex,

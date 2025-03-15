@@ -2,6 +2,7 @@ import 'package:expense_split/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -360,6 +361,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ],
                       ),
                     ),
+                  ),
+                  ShadButton.destructive(
+                    width: double.infinity,
+                    onPressed: () async {
+                      await _auth.signOut();
+                    },
+                    child: const Text('Sign Out'),
                   ),
                 ],
               ),
