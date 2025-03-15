@@ -5,6 +5,7 @@ import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:expense_split/pages/auth_screen.dart';
 import 'package:expense_split/pages/splash_screen.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,11 +20,19 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return ShadApp(
         title: 'Expense Split',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          useMaterial3: true,
+        darkTheme: ShadThemeData(
+          brightness: Brightness.dark,
+          colorScheme: const ShadZincColorScheme.dark(),
+          // Example of custom font family
+          // textTheme: ShadTextTheme(family: 'UbuntuMono'),
+        ),
+        theme: ShadThemeData(
+          brightness: Brightness.dark,
+          colorScheme: const ShadZincColorScheme.dark(),
+          // Example of custom font family
+          // textTheme: ShadTextTheme(family: 'UbuntuMono'),
         ),
         home: StreamBuilder(
             stream: FirebaseAuth.instance.authStateChanges(),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 class AuthForm extends StatefulWidget {
   const AuthForm({
@@ -22,7 +23,8 @@ class AuthForm extends StatefulWidget {
 }
 
 class _AuthFormState extends State<AuthForm> {
-  final _formKey = GlobalKey<FormState>();
+  final _formKey = GlobalKey<ShadFormState>();
+  bool _obscure = true;
   var _isLogin = true;
   var _userEmail = '';
   var _userName = '';
@@ -32,7 +34,12 @@ class _AuthFormState extends State<AuthForm> {
   void _trySubmit() {
     final isValid = _formKey.currentState?.validate() ?? false;
     FocusScope.of(context).unfocus();
-
+    _userEmail = _formKey.currentState?.value['email'] as String;
+    _userPassword = _formKey.currentState?.value['password'] as String;
+    if (!_isLogin) {
+      _userName = _formKey.currentState?.value['username'] as String;
+      _vpa = _formKey.currentState?.value['vpa'] as String;
+    }
     if (isValid) {
       _formKey.currentState!.save();
       widget.submitFn(_userEmail.trim(), _userPassword.trim(), _userName.trim(),
@@ -42,227 +49,109 @@ class _AuthFormState extends State<AuthForm> {
 
   @override
   Widget build(BuildContext context) {
-    ThemeData theme = Theme.of(context);
-    return SafeArea(
-      child: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 25),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const SizedBox(height: 30),
-
-              // Logo/Icon
-              Icon(
-                Icons.account_balance_wallet_rounded,
-                size: 100,
-                color: theme.primaryColor,
-              ),
-
-              const SizedBox(height: 30),
-
-              // Welcome text
-              Text(
-                _isLogin ? 'Welcome back!' : 'Create your account',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).primaryColor,
+    return Scaffold(
+      body: Center(
+        child: ShadForm(
+          key: _formKey,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 350),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 16),
+                ShadInputFormField(
+                  id: 'email',
+                  leading: const Icon(LucideIcons.mail),
+                  label: const Text('Email'),
+                  placeholder: const Text('Enter your email'),
+                  validator: (v) {
+                    if (!v.contains('@')) {
+                      return 'Please enter a valid email address.';
+                    }
+                    return null;
+                  },
                 ),
-              ),
-
-              const SizedBox(height: 25),
-
-              // Form fields
-              Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    // Email field
-                    TextFormField(
-                      key: const ValueKey('email'),
-                      decoration: InputDecoration(
-                        labelText: 'Email',
-                        hintText: 'Enter your email',
-                        prefixIcon: const Icon(Icons.email),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(color: Colors.grey.shade300),
-                        ),
-                      ),
-                      keyboardType: TextInputType.emailAddress,
-                      autocorrect: false,
-                      textCapitalization: TextCapitalization.none,
-                      enableSuggestions: false,
-                      validator: (value) {
-                        if (value!.isEmpty || !value.contains('@')) {
-                          return 'Please enter a valid email address';
-                        }
-                        return null;
-                      },
-                      onSaved: (value) {
-                        _userEmail = value!;
-                      },
-                    ),
-
-                    const SizedBox(height: 15),
-
-                    // Username field (only for signup)
-                    if (!_isLogin)
-                      TextFormField(
-                        key: const ValueKey('username'),
-                        decoration: InputDecoration(
-                          labelText: 'Username',
-                          hintText: 'Create a username',
-                          prefixIcon: const Icon(Icons.person),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(color: Colors.grey.shade300),
-                          ),
-                        ),
-                        autocorrect: true,
-                        textCapitalization: TextCapitalization.words,
-                        enableSuggestions: false,
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Please enter a username';
-                          }
-                          return null;
-                        },
-                        onSaved: (value) {
-                          _userName = value!;
-                        },
-                      ),
-
-                    if (!_isLogin) const SizedBox(height: 15),
-                    if (!_isLogin)
-                      TextFormField(
-                        key: const ValueKey('vpa'),
-                        decoration: InputDecoration(
-                          labelText: 'VPA',
-                          hintText: 'Enter your VPA',
-                          prefixIcon: const Icon(Icons.account_balance_wallet),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(color: Colors.grey.shade300),
-                          ),
-                        ),
-                        keyboardType: TextInputType.emailAddress,
-                        autocorrect: false,
-                        textCapitalization: TextCapitalization.none,
-                        enableSuggestions: false,
-                        validator: (value) {
-                          if (value!.isEmpty || !value.contains('@')) {
-                            return 'Please enter a valid VPA';
-                          }
-                          return null;
-                        },
-                        onSaved: (value) {
-                          _vpa = value!;
-                        },
-                      ),
-                    if (!_isLogin) const SizedBox(height: 15),
-
-                    // Password field
-                    TextFormField(
-                      key: const ValueKey('password'),
-                      decoration: InputDecoration(
-                        labelText: 'Password',
-                        hintText: 'Enter your password',
-                        prefixIcon: const Icon(Icons.lock),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(color: Colors.grey.shade300),
-                        ),
-                      ),
-                      obscureText: true,
-                      validator: (value) {
-                        if (value!.isEmpty || value.length < 7) {
-                          return 'Password must be at least 7 characters';
-                        }
-                        return null;
-                      },
-                      onSaved: (value) {
-                        _userPassword = value!;
-                      },
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 15),
-
-              // Forgot password row (only for login)
-              if (_isLogin)
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () {},
-                    child: Text(
-                      'Forgot Password?',
-                      style: TextStyle(color: Theme.of(context).primaryColor),
-                    ),
-                  ),
-                ),
-
-              const SizedBox(height: 20),
-
-              // Submit button
-              if (widget.isLoading)
-                const CircularProgressIndicator()
-              else
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _trySubmit,
-                    child: Text(
-                      _isLogin ? 'LOGIN' : 'SIGN UP',
-                    ),
-                  ),
-                ),
-
-              const SizedBox(height: 30),
-
-              // Toggle between login/signup
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    _isLogin
-                        ? 'Don\'t have an account?'
-                        : 'Already have an account?',
-                    style: const TextStyle(color: Colors.grey),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      setState(() {
-                        _isLogin = !_isLogin;
-                      });
+                const SizedBox(height: 16),
+                if (!_isLogin)
+                  ShadInputFormField(
+                    id: 'username',
+                    leading: const Icon(LucideIcons.user),
+                    label: const Text('Username'),
+                    placeholder: const Text('Enter your Username'),
+                    validator: (v) {
+                      if (v.isEmpty) {
+                        return 'Please enter a valid username.';
+                      }
+                      return null;
                     },
-                    child: Text(
-                      _isLogin ? 'Sign Up' : 'Login',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    ),
                   ),
-                ],
-              ),
-            ],
+                if (!_isLogin) const SizedBox(height: 16),
+                if (!_isLogin)
+                  ShadInputFormField(
+                    id: 'vpa',
+                    label: const Text('VPA'),
+                    leading: const Icon(LucideIcons.creditCard),
+                    placeholder: const Text('Enter your VPA'),
+                    validator: (v) {
+                      if (v.isEmpty || !v.contains('@')) {
+                        return 'Please enter a valid VPA.';
+                      }
+                      return null;
+                    },
+                  ),
+                if (!_isLogin) const SizedBox(height: 16),
+                ShadInputFormField(
+                  id: 'password',
+                  obscureText: _obscure,
+                  leading: const Icon(LucideIcons.lock),
+                  label: const Text('Password'),
+                  placeholder: const Text('Enter your Password'),
+                  validator: (v) {
+                    if (v.length < 7) {
+                      return 'Password must be at least 7 characters.';
+                    }
+                    return null;
+                  },
+                  trailing: ShadIconButton(
+                    width: 24,
+                    height: 24,
+                    padding: EdgeInsets.zero,
+                    decoration: const ShadDecoration(
+                      secondaryBorder: ShadBorder.none,
+                      secondaryFocusedBorder: ShadBorder.none,
+                    ),
+                    icon: Icon(_obscure ? LucideIcons.eyeOff : LucideIcons.eye),
+                    onPressed: () {
+                      setState(() => _obscure = !_obscure);
+                    },
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ShadButton(
+                  width: double.infinity,
+                  onPressed: _trySubmit,
+                  child: Text(_isLogin ? 'Login' : 'Sign Up'),
+                ),
+                const SizedBox(height: 16),
+                const Divider(),
+                ShadButton.link(
+                  child: Text("Forgot your password?"),
+                  width: double.infinity,
+                ),
+                ShadButton.link(
+                  width: double.infinity,
+                  onPressed: () {
+                    setState(() {
+                      _isLogin = !_isLogin;
+                    });
+                  },
+                  child: Text(_isLogin
+                      ? 'Create new account'
+                      : 'Already Have an Account?'),
+                )
+              ],
+            ),
           ),
         ),
       ),
