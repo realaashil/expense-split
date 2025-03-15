@@ -19,10 +19,6 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  Future<void> _signOut() async {
-    await FirebaseAuth.instance.signOut();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

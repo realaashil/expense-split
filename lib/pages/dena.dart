@@ -2,7 +2,7 @@ import 'package:expense_split/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:intl/intl.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Dena extends StatefulWidget {
@@ -171,143 +171,66 @@ class _DenaState extends State<Dena> {
                 dateStr = DateFormat('MMM d, y').format(date);
               }
 
-              return Card(
-                margin: const EdgeInsets.only(bottom: 16),
-                elevation: 2,
-                clipBehavior: Clip.antiAlias,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  side: BorderSide(
-                    color: isPaid
-                        ? theme.colorScheme.primary.withValues(alpha: 0.3)
-                        : theme.colorScheme.error.withValues(alpha: 0.3),
-                    width: 1.0,
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    // Colored header
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 12, horizontal: 16),
-                      color: isPaid
-                          ? theme.colorScheme.primary.withValues(alpha: 0.1)
-                          : theme.colorScheme.error.withValues(alpha: 0.1),
-                      child: Row(
-                        children: [
-                          CircleAvatar(
-                            radius: 24,
-                            backgroundColor: isPaid
-                                ? theme.colorScheme.primary
-                                : theme.colorScheme.error,
-                            foregroundColor: Colors.white,
-                            child: Text(
-                              '₹${amount.toInt()}',
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold),
-                            ),
+              return Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ShadCard(
+                  clipBehavior: Clip.antiAlias,
+                  title: Row(children: [
+                    Text(description.trim()),
+                    Expanded(
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: Text(
+                          'You owe ₹${amount.toInt()}',
+                          style: TextStyle(
+                            color: isPaid ? Colors.green : Colors.red,
+                            fontSize: 16,
+                            decoration:
+                                isPaid ? TextDecoration.lineThrough : null,
                           ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'To: $creatorName',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  description,
-                                  style: TextStyle(
-                                    color: theme.colorScheme.onSurface
-                                        .withValues(alpha: 0.7),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Chip(
-                            label: Text(isPaid ? 'PAID' : 'PENDING'),
-                            backgroundColor: isPaid
-                                ? theme.colorScheme.primary
-                                    .withValues(alpha: 0.2)
-                                : theme.colorScheme.error
-                                    .withValues(alpha: 0.2),
-                            labelStyle: TextStyle(
-                              color: isPaid
-                                  ? theme.colorScheme.primary
-                                  : theme.colorScheme.error,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
-                            ),
-                            padding: EdgeInsets.zero,
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    // Date row
-                    Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.calendar_today,
-                            size: 16,
-                            color: theme.colorScheme.onSurface
-                                .withValues(alpha: 0.6),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            dateStr,
-                            style: TextStyle(
-                              color: theme.colorScheme.onSurface
-                                  .withValues(alpha: 0.6),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    // Action buttons
-                    if (!isPaid)
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: OutlinedButton.icon(
-                                onPressed: () => _markAsPaid(expenseDoc.id),
-                                icon: const Icon(Icons.check_circle),
-                                label: const Text('MARK AS PAID'),
-                                style: OutlinedButton.styleFrom(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 12),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: FilledButton.icon(
-                                onPressed: () => _initiateUpiPayment(expense),
-                                icon: const Icon(Icons.payment),
-                                label: const Text('PAY NOW'),
-                                style: FilledButton.styleFrom(
-                                  backgroundColor: theme.colorScheme.primary,
-                                  foregroundColor: Colors.white,
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 12),
-                                ),
-                              ),
-                            ),
-                          ],
                         ),
                       ),
-                  ],
+                    )
+                  ]),
+                  footer: Column(
+                    children: [
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ShadButton.outline(
+                              width: double.infinity,
+                              onPressed: isPaid
+                                  ? null
+                                  : () => _markAsPaid(expenseDoc.id),
+                              child: Text(isPaid ? 'Paid' : 'Mark as Paid'),
+                            ),
+                          ),
+                          if (!isPaid) const SizedBox(width: 16),
+                          if (!isPaid)
+                            Expanded(
+                              child: ShadButton(
+                                width: double.infinity,
+                                onPressed: () => _initiateUpiPayment(expense),
+                                child: Text('Pay Now'),
+                              ),
+                            )
+                        ],
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      Text('From: $creatorName'),
+                      const Spacer(),
+                      Text(
+                        'Added on $dateStr',
+                        style: theme.textTheme.bodySmall,
+                      ),
+                    ],
+                  ),
                 ),
               );
             },
