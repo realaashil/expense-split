@@ -137,6 +137,7 @@ class _LenaState extends State<Lena> {
           StatefulBuilder(
             builder: (context, setState) {
               return ShadBadge.outline(
+                padding: EdgeInsets.all(8),
                 foregroundColor:
                     _selectedUsers.contains(k) ? Colors.black : Colors.white,
                 backgroundColor:
