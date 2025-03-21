@@ -17,7 +17,6 @@ class Database {
       };
       await _db.collection("users").doc(userID).set(user);
     } catch (e) {
-      print("Firestore error: $e");
       rethrow;
     }
   }
@@ -99,5 +98,23 @@ class Database {
         .collection('favorites')
         .doc(favoriteId)
         .delete();
+  }
+
+  static Future<Map<String, String>> getFavorites() async {
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw Exception("User not found");
+    }
+    final snapshot = await _db
+        .collection('users')
+        .doc(user.uid)
+        .collection('favorites')
+        .get();
+    final favorites = <String, String>{};
+    for (final doc in snapshot.docs) {
+      final data = doc.data();
+      favorites[data['email']] = data['name'];
+    }
+    return favorites;
   }
 }

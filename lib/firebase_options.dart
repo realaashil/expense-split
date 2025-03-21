@@ -83,5 +83,4 @@ class DefaultFirebaseOptions {
     authDomain: 'expense-split-aashil.firebaseapp.com',
     storageBucket: 'expense-split-aashil.firebasestorage.app',
   );
-
 }

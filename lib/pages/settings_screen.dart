@@ -332,7 +332,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       leading: CircleAvatar(
                                         backgroundColor: theme
                                             .colorScheme.primary
-                                            .withOpacity(0.2),
+                                            .withValues(alpha: 0.2),
                                         child: Text(
                                           name.isNotEmpty
                                               ? name[0].toUpperCase()

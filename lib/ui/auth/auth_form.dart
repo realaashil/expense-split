@@ -136,8 +136,8 @@ class _AuthFormState extends State<AuthForm> {
                 const SizedBox(height: 16),
                 const Divider(),
                 ShadButton.link(
-                  child: Text("Forgot your password?"),
                   width: double.infinity,
+                  child: Text("Forgot your password?"),
                 ),
                 ShadButton.link(
                   width: double.infinity,

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:intl/intl.dart';
 import 'package:expense_split/services/database.dart';
 import 'package:expense_split/ui/card/expense_card.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 class Lena extends StatefulWidget {
   const Lena({super.key});
@@ -13,126 +13,15 @@ class Lena extends StatefulWidget {
 }
 
 class _LenaState extends State<Lena> {
-  final _formKey = GlobalKey<FormState>();
+  final _formKey = GlobalKey<ShadFormState>();
   final _amountController = TextEditingController();
-  final _payerEmailController = TextEditingController();
   final _descriptionController = TextEditingController();
+  final Set<String> _selectedUsers = {};
+
+  bool split = false;
 
   final _firestore = FirebaseFirestore.instance;
   final _auth = FirebaseAuth.instance;
-
-  @override
-  void dispose() {
-    _amountController.dispose();
-    _payerEmailController.dispose();
-    _descriptionController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _addExpense() async {
-    if (_formKey.currentState!.validate()) {
-      try {
-        // Get current user
-        double amount = double.parse(_amountController.text);
-        amount = double.parse(amount.toStringAsFixed(2));
-        String email = _payerEmailController.text.trim();
-        String description = _descriptionController.text.trim();
-        Database.addExpense(amount, email, description);
-
-        // Clear controllers
-        _amountController.clear();
-        _payerEmailController.clear();
-        _descriptionController.clear();
-
-        // Show success message
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Expense added successfully')),
-          );
-          Navigator.pop(context); // Close the dialog
-        }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error adding expense: $e')),
-          );
-        }
-      }
-    }
-  }
-
-  void _showAddExpenseDialog() {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Add New Expense'),
-        content: Form(
-          key: _formKey,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextFormField(
-                  controller: _amountController,
-                  decoration: const InputDecoration(
-                    labelText: 'Amount',
-                    prefixIcon: Icon(Icons.currency_rupee),
-                  ),
-                  keyboardType: TextInputType.number,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter an amount';
-                    }
-                    if (double.tryParse(value) == null) {
-                      return 'Please enter a valid number';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 10),
-                TextFormField(
-                  controller: _payerEmailController,
-                  decoration: const InputDecoration(
-                    labelText: 'Payer Email',
-                    prefixIcon: Icon(Icons.email),
-                  ),
-                  keyboardType: TextInputType.emailAddress,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter payer email';
-                    }
-                    if (!value.contains('@')) {
-                      return 'Please enter a valid email';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 10),
-                TextFormField(
-                  controller: _descriptionController,
-                  decoration: const InputDecoration(
-                    labelText: 'Description (Optional)',
-                    prefixIcon: Icon(Icons.description),
-                  ),
-                  maxLines: 2,
-                ),
-              ],
-            ),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: _addExpense,
-            child: const Text('Add'),
-          ),
-        ],
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -198,5 +87,166 @@ class _LenaState extends State<Lena> {
         child: const Icon(Icons.add),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _amountController.dispose();
+    _descriptionController.dispose();
+    _selectedUsers.clear();
+    super.dispose();
+  }
+
+  Future<void> _addExpense() async {
+    if (_formKey.currentState!.validate()) {
+      try {
+        // Get current user
+        double amount = double.parse(_amountController.text);
+        amount = double.parse(amount.toStringAsFixed(2));
+        if (split) {
+          amount =
+              double.parse((amount / _selectedUsers.length).toStringAsFixed(2));
+        }
+        String description = _descriptionController.text.trim();
+        for (String email in _selectedUsers) {
+          Database.addExpense(amount, email, description);
+        }
+        _amountController.clear();
+        _descriptionController.clear();
+        _selectedUsers.clear();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Expense added successfully')),
+          );
+          Navigator.pop(context); // Close the dialog
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error adding expense: $e')),
+          );
+        }
+      }
+    }
+  }
+
+  void _showAddExpenseDialog() async {
+    var favoriteUsers = await Database.getFavorites();
+    var options = <Widget>[];
+    favoriteUsers.forEach((k, v) => options.add(
+          StatefulBuilder(
+            builder: (context, setState) {
+              return ShadBadge.outline(
+                foregroundColor:
+                    _selectedUsers.contains(k) ? Colors.black : Colors.white,
+                backgroundColor:
+                    _selectedUsers.contains(k) ? Colors.white : Colors.black,
+                child: Text(v),
+                onPressed: () {
+                  setState(() {
+                    if (_selectedUsers.contains(k)) {
+                      _selectedUsers.remove(k);
+                    } else {
+                      _selectedUsers.add(k);
+                    }
+                  });
+                },
+              );
+            },
+          ),
+        ));
+    if (mounted) {
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Add New Expense'),
+          content: ShadForm(
+            key: _formKey,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ShadInputFormField(
+                    controller: _descriptionController,
+                    placeholder: Text('Enter Title'),
+                    leading: const Padding(
+                      padding: EdgeInsets.all(4.0),
+                      child: Icon(LucideIcons.text),
+                    ),
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return 'Please enter a title';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 10),
+                  ShadInputFormField(
+                    controller: _amountController,
+                    keyboardType: TextInputType.number,
+                    placeholder: Text('Enter amount'),
+                    leading: const Padding(
+                      padding: EdgeInsets.all(4.0),
+                      child: Icon(LucideIcons.indianRupee),
+                    ),
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return 'Please enter an amount';
+                      }
+                      if (double.tryParse(value) == null) {
+                        return 'Please enter a valid number';
+                      }
+                      if (int.parse(value) < 0 || int.parse(value) > 95000) {
+                        return 'Please enter value between 0 to 95,000';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 10),
+                  ShadFormBuilderField(
+                    validator: (obj) {
+                      if (_selectedUsers.isEmpty) {
+                        return 'Select atleast one person';
+                      }
+                      return null;
+                    },
+                    builder: (context) => Wrap(
+                      spacing: 4.0,
+                      children: options,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Row(
+                      children: [
+                        Expanded(child: Text("Split Evenly?")),
+                        const SizedBox(width: 10),
+                        ShadSwitchFormField(
+                          initialValue: false,
+                          onChanged: (v) {
+                            split = v;
+                          },
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: _addExpense,
+              child: const Text('Add'),
+            ),
+          ],
+        ),
+      );
+    }
   }
 }

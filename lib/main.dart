@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ShadApp(
+    return ShadApp.material(
         title: 'Expense Split',
         darkTheme: ShadThemeData(
           brightness: Brightness.dark,
