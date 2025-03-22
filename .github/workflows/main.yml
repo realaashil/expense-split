@@ -9,15 +9,15 @@ on:
     branches:
       - main
 
-jobs:  
-  build:      
-    name: Build & Release 
-    runs-on: ubuntu-latest 
+jobs:
+  build:
+    name: Build & Release
+    runs-on: ubuntu-latest
     permissions:
       contents: write
 
     steps:
-        #1 Checkout Repository
+      #1 Checkout Repository
       - name: Checkout Repository
         uses: actions/checkout@v3
 
@@ -33,9 +33,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
-          flutter-version-file: pubspec.yaml 
-
-
+          flutter-version-file: pubspec.yaml
 
         #4 Install Dependencies
       - name: Install Dependencies
@@ -63,14 +61,17 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-        
-       #6 Building APK
+
+        #6 Building APK
       - name: Build APK
         run: flutter build apk --release
 
         #7 Building App Bundle (aab)
       - name: Build appBundle
         run: flutter build appbundle
+
+      - name: Build Web
+        run: flutter build web
 
         #9 Upload Artifacts
       - name: Upload Artifacts
@@ -80,6 +81,16 @@ jobs:
           path: |
             build/app/outputs/flutter-apk/app-release.apk
             build/app/outputs/bundle/release/app-release.aab
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build/web
+          force_orphan: true
+          user_name: "github-ci[bot]"
+          user_email: "github-actions[bot]@users.noreply.github.com"
+          commit_message: "Publish to gh-pages"
 
         #10 Extract Version
       - name: Extract version from pubspec.yaml
@@ -112,4 +123,3 @@ jobs:
         with:
           artifacts: "build/app/outputs/flutter-apk/app-release.apk,build/app/outputs/bundle/release/app-release.aab"
           tag: v${{ env.VERSION }}
-        
